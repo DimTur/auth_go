@@ -1,0 +1,19 @@
+POST http://localhost:8080/register
+
+{
+    "username": "user1",
+    "password": "123"
+}
+
+###
+
+POST http://localhost:8080/login
+
+{
+    "username": "user1",
+    "password": "123"
+}
+
+###
+
+GET http://localhost:8080/build
