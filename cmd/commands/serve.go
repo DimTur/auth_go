@@ -1,13 +1,15 @@
 package commands
 
 import (
+	"auth_go_hw/config"
 	"auth_go_hw/internal/buildinfo"
 	"auth_go_hw/internal/handlers"
 	"auth_go_hw/internal/storage"
 	"context"
 	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
+	"os"
 	"os/signal"
 	"syscall"
 	"time"
@@ -17,17 +19,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type Response struct {
-	Error string
-	Data  interface{}
-}
-
 func NewServeCmd() *cobra.Command {
 	c := &cobra.Command{
 		Use:     "serve",
 		Aliases: []string{"s"},
 		Short:   "Start API server",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			log := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+
 			ctx, cancel := signal.NotifyContext(cmd.Context(), syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
 			defer cancel()
 
@@ -41,24 +40,30 @@ func NewServeCmd() *cobra.Command {
 				return err
 			}
 
+			cfg, err := config.Parse("../config.yaml")
+			if err != nil {
+				return err
+			}
+
+			slog.Info("loaded cfg", slog.Any("cfg", cfg))
+
 			router.Post("/register", handlers.RegisterHandler(&s))
 			router.Post("/login", handlers.LoginHandler(&s))
 			router.Get("/build", buildinfo.BuildInfoHandler(buildinfo.New()))
 
 			httpServer := http.Server{
-				Addr:         "localhost:8080",
-				ReadTimeout:  time.Second,
-				WriteTimeout: time.Second,
+				Addr:         cfg.HTTPServer.Address,
+				ReadTimeout:  cfg.HTTPServer.Timeout,
+				WriteTimeout: cfg.HTTPServer.Timeout,
 				Handler:      router,
 			}
 
-			// TODO change logger slog
 			go func() {
 				if err := httpServer.ListenAndServe(); err != nil {
-					log.Println("ListenAndServe", err)
+					log.Error("ListenAndServe", slog.Any("err", err))
 				}
 			}()
-			log.Println("server listening: 8080")
+			log.Info("server listening: 8080")
 
 			<-ctx.Done()
 

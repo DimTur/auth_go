@@ -6,7 +6,14 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+
+	"github.com/go-playground/validator"
 )
+
+type Response struct {
+	Error string
+	Data  interface{}
+}
 
 type RegisterRequest struct {
 	Username string `json:"username" validate:"requered,min=3,max=20"`
@@ -37,6 +44,11 @@ func RegisterHandler(ur UserRepository) http.HandlerFunc {
 		})
 		if err != nil {
 			http.Error(w, "reg err", http.StatusBadRequest)
+			return
+		}
+
+		if err = validator.New().Struct(req); err != nil {
+			http.Error(w, "validation err", http.StatusBadRequest)
 			return
 		}
 	}
