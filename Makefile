@@ -1,6 +1,6 @@
 BUILD_DIR ?= bin
 BUILD_PACKAGE ?= ./cmd/main.go
-PROJECT_PKG = github.com/bogatyr285/auth-go
+PROJECT_PKG = github.com/DimTur/auth_go
 
 VERSION ?= $(shell git describe --tags --exact-match 2>/dev/null || git symbolic-ref -q --short HEAD)
 COMMIT_HASH ?= $(shell git rev-parse --short HEAD 2>/dev/null)

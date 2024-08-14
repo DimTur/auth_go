@@ -1,7 +1,6 @@
 package buildinfo
 
 import (
-	"log"
 	"runtime"
 )
 
@@ -18,7 +17,6 @@ type BuildInfo struct {
 
 // New returns all available build information.
 func New() BuildInfo {
-	log.Println("BuildInfo: ", version, buildDate)
 	return BuildInfo{
 		Version:    version,
 		CommitHash: commitHash,
