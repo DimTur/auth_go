@@ -1,0 +1,6 @@
+package: gen
+output: internal/gateway/http/gen/rest.gen.go
+generate:
+  embedded-spec: true
+  strict-server: true
+  chi-server: true

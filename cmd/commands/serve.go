@@ -2,11 +2,13 @@ package commands
 
 import (
 	"auth_go_hw/config"
+	"auth_go_hw/internal/auth/repository"
+	"auth_go_hw/internal/auth/usecase"
 	"auth_go_hw/internal/buildinfo"
-	"auth_go_hw/internal/handlers"
-	"auth_go_hw/internal/storage"
+	"auth_go_hw/internal/gateway/http/gen"
+	"auth_go_hw/internal/pkg/crypto"
+	"auth_go_hw/internal/pkg/jwt"
 	"context"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
@@ -20,6 +22,8 @@ import (
 )
 
 func NewServeCmd() *cobra.Command {
+	var configPath string
+
 	c := &cobra.Command{
 		Use:     "serve",
 		Aliases: []string{"s"},
@@ -35,27 +39,40 @@ func NewServeCmd() *cobra.Command {
 			router.Use(middleware.Recoverer)
 			router.Use(middleware.Logger)
 
-			s, err := storage.New("./users.sql")
-			if err != nil {
-				return err
-			}
-
-			cfg, err := config.Parse("../config.yaml")
+			cfg, err := config.Parse(configPath)
 			if err != nil {
 				return err
 			}
 
 			slog.Info("loaded cfg", slog.Any("cfg", cfg))
 
-			router.Post("/register", handlers.RegisterHandler(&s))
-			router.Post("/login", handlers.LoginHandler(&s))
-			router.Get("/build", buildinfo.BuildInfoHandler(buildinfo.New()))
+			storage, err := repository.New("./users.sql")
+			if err != nil {
+				return err
+			}
+
+			passwordHasher := crypto.NewPasswordHasher()
+			jwtManager, err := jwt.NewJWTManager(
+				cfg.JWT.Issuer,
+				cfg.JWT.AccessExpiresIn,
+				cfg.JWT.RefreshExpiresIn,
+				[]byte(cfg.JWT.PublicKey),
+				[]byte(cfg.JWT.PrivateKey),
+			)
+			if err != nil {
+				return err
+			}
+
+			useCase := usecase.NewUseCase(&storage,
+				passwordHasher,
+				jwtManager,
+				buildinfo.New())
 
 			httpServer := http.Server{
 				Addr:         cfg.HTTPServer.Address,
 				ReadTimeout:  cfg.HTTPServer.Timeout,
 				WriteTimeout: cfg.HTTPServer.Timeout,
-				Handler:      router,
+				Handler:      gen.HandlerFromMux(gen.NewStrictHandler(useCase, nil), router),
 			}
 
 			go func() {
@@ -63,19 +80,22 @@ func NewServeCmd() *cobra.Command {
 					log.Error("ListenAndServe", slog.Any("err", err))
 				}
 			}()
-			log.Info("server listening: 8080")
+			log.Info("server listening:", slog.Any("port", cfg.HTTPServer.Address))
 
 			<-ctx.Done()
 
 			closeCtx, _ := context.WithTimeout(context.Background(), time.Second)
 			if err := httpServer.Shutdown(closeCtx); err != nil {
-				return fmt.Errorf("http closing err: %s", err)
+				log.Error("httpServer.Shutdown", slog.Any("err", err))
 			}
-			// close db connection
-			// etc
+
+			if err := storage.Close(); err != nil {
+				log.Error("storage.Close", slog.Any("err", err))
+			}
 
 			return nil
 		},
 	}
+	c.Flags().StringVar(&configPath, "config", "", "path to config")
 	return c
 }

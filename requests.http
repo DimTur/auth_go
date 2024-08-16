@@ -1,4 +1,4 @@
-POST http://localhost:8080/register
+POST http://localhost:8081/register
 
 {
     "username": "user1",
@@ -7,7 +7,7 @@ POST http://localhost:8080/register
 
 ###
 
-POST http://localhost:8080/login
+POST http://localhost:8081/login
 
 {
     "username": "user1",
@@ -16,4 +16,12 @@ POST http://localhost:8080/login
 
 ###
 
-GET http://localhost:8080/build
+POST http://localhost:8081/refresh
+
+{
+    "refreshToken": "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjM5Mjc5MzIsImlhdCI6MTcyMzgxOTkzMiwiaXNzIjoiYXV0aC1zZXJ2aWNlIiwic3ViIjoiMSIsInR5cGUiOiJyZWZyZXNoIn0.8gY8dJLqqjA8wP7veGolXrQNQJPp26lxTgq3TXkxlMrO4itrqtbE0hZedE1Oq9btJIXBCCLtZUSgucTzZOljBQ"
+}
+
+###
+
+GET http://localhost:8081/build

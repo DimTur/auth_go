@@ -1,0 +1,231 @@
+openapi: 3.0.1
+info:
+  version: 1.0.0
+  title: User Authentication API
+  description: API for user registration and login
+
+paths:
+  /register:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterUserRequest'
+      responses:
+        '201':
+          description: User successfully registered
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/RegisterUserResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  
+  /login:
+    post:
+      summary: Login a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginUserRequest'
+      responses:
+        '200':
+          description: User successfully loggedin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginUserResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /refresh:
+    post:
+      summary: Refresh the access token using a refresh token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+      responses:
+        '200':
+          description: Access token successfully refreshed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshTokenResponse'
+        '401':
+          description: Unauthorized or invalid refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /buildinfo:
+    get:
+      summary: Get build information
+      responses:
+        '200':
+          description: Build information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BuildInfo'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+
+components:
+  schemas:
+    RegisterUserRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Username of the new user
+        password:
+          type: string
+          description: Password of the new user
+      required:
+        - username
+        - password
+
+    LoginUserRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Username of the existing user
+        password:
+          type: string
+          description: Password of the existing user
+      required:
+        - username
+        - password
+    
+    RegisterUserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the registered user
+        username:
+          type: string
+          description: Username of the newly registered user
+      required:
+        - id
+        - username
+
+    LoginUserResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: JWT token for accessing protected routes
+        refreshToken:
+          type: string
+          description: Token used to obtain a new access token without requiring the user to re-authenticate.
+      required:
+        - accessToken
+        - refreshToken
+
+    RefreshTokenRequest:
+      type: object
+      properties:
+        refreshToken:
+          type: string
+          description: Token used to obtain a new access token
+      required:
+        - refreshToken
+
+    RefreshTokenResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: New JWT token for accessing protected routes
+      required:
+        - accessToken
+    
+    BuildInfo:
+      type: object
+      properties:
+        version:
+          type: string
+          description: Version of the build
+        commit_hash:
+          type: string
+          description: Commit hash of the source code
+        build_date:
+          type: string
+          description: Date of the build
+        go_version:
+          type: string
+          description: Go programming language version used for the build
+        os:
+          type: string
+          description: Operating system used for the build
+        arch:
+          type: string
+          description: Architecture of the machine used for the build
+        compiler:
+          type: string
+          description: Compiler used for the build
+      required:
+        - version
+        - commit_hash
+        - build_date
+        - go_version
+        - os
+        - arch
+        - compiler
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Description of the error
+      required:
+        - error
