@@ -4,7 +4,6 @@ import (
 	"auth_go_hw/config"
 	"auth_go_hw/internal/auth/repository"
 	"auth_go_hw/internal/auth/usecase"
-	"auth_go_hw/internal/buildinfo"
 	"auth_go_hw/internal/gateway/http/gen"
 	"auth_go_hw/internal/pkg/crypto"
 	"auth_go_hw/internal/pkg/jwt"
@@ -66,7 +65,8 @@ func NewServeCmd() *cobra.Command {
 			useCase := usecase.NewUseCase(&storage,
 				passwordHasher,
 				jwtManager,
-				buildinfo.New())
+				// buildinfo.New()
+			)
 
 			httpServer := http.Server{
 				Addr:         cfg.HTTPServer.Address,

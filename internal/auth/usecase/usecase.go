@@ -11,6 +11,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+//go:generate mockgen -source=usecase.go -destination=../../../mocks/usecase_mock.go -package mocks
 type UserRepository interface {
 	RegisterUser(ctx context.Context, u entity.UserAccount) error
 	FindUserByLogin(ctx context.Context, username string) (entity.UserAccount, error)
@@ -20,11 +21,13 @@ type UserRepository interface {
 	FindRefreshToken(ctx context.Context, userID string) (entity.RefreshToken, error)
 }
 
+//go:generate mockgen -source=usecase.go -destination=../../../mocks/usecase_mock.go -package mock
 type CryptoPassword interface {
 	HashPassword(password string) ([]byte, error)
 	ComparePassword(fromUser, fromDB string) bool
 }
 
+//go:generate mockgen -source=usecase.go -destination=../../../mocks/usecase_mock.go -package mock
 type JWTManager interface {
 	IssueAccessToken(userID string) (string, error)
 	IssueRefreshToken(userID string) (string, error)
@@ -43,13 +46,13 @@ func NewUseCase(
 	userRepo UserRepository,
 	cryptoPsw CryptoPassword,
 	jwtManager JWTManager,
-	buildInfo buildinfo.BuildInfo,
+	// buildInfo buildinfo.BuildInfo,
 ) AuthUseCase {
 	return AuthUseCase{
 		userRepo:   userRepo,
 		cryptoPsw:  cryptoPsw,
 		jwtManager: jwtManager,
-		buildInfo:  buildInfo,
+		// buildInfo:  buildInfo,
 	}
 }
 
