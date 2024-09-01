@@ -1,0 +1,222 @@
+{
+	"info": {
+		"_postman_id": "00368ddb-b131-4953-aaa3-b05b02af0796",
+		"name": "auth go",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26738274"
+	},
+	"item": [
+		{
+			"name": "e2e_auth",
+			"item": [
+				{
+					"name": "register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseJSON = pm.response.json();",
+									"",
+									"// check that response status HTTP 201 CREATED",
+									"pm.test(\"Registration successful\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"// Save env vars",
+									"pm.environment.set(\"username\", responseJSON.username);",
+									"",
+									"// check that 'username' from environment & response are equal",
+									"pm.test(\"Response contains 'username' property\", () => {",
+									"  pm.expect(pm.environment.get('username')).to.eql(responseJSON.username);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"user3\",\n    \"password\": \"validpassword\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{LOCAL_URL}}/register",
+							"host": [
+								"{{LOCAL_URL}}"
+							],
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseJSON = pm.response.json();",
+									"",
+									"// check that response status HTTP 200",
+									"pm.test(\"Login successful\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Save env vars",
+									"pm.environment.set(\"access_token\", responseJSON.accessToken);",
+									"pm.environment.set(\"refresh_token\", responseJSON.refreshToken);",
+									"",
+									"// check that 'access_token' from environment & response are equal",
+									"pm.test(\"Response contains 'access_token' property\", () => {",
+									"  pm.expect(pm.environment.get('access_token')).to.eql(responseJSON.accessToken);",
+									"});",
+									"",
+									"// check that 'refresh_token' from environment & response are equal",
+									"pm.test(\"Response contains 'refresh_token' property\", () => {",
+									"  pm.expect(pm.environment.get('refresh_token')).to.eql(responseJSON.refreshToken);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"{{username}}\",\n    \"password\": \"{{password}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{LOCAL_URL}}/login",
+							"host": [
+								"{{LOCAL_URL}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "refresh",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseJSON = pm.response.json();",
+									"",
+									"// check that response status HTTP 200",
+									"pm.test(\"Refresh accessToken successful\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Save env vars",
+									"pm.environment.set(\"access_token\", responseJSON.accessToken);",
+									"",
+									"// check that 'access_token' from environment & response are equal",
+									"pm.test(\"Response contains 'access_token' property\", () => {",
+									"  pm.expect(pm.environment.get('access_token')).to.eql(responseJSON.accessToken);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refreshToken\": \"{{refresh_token}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{LOCAL_URL}}/refresh",
+							"host": [
+								"{{LOCAL_URL}}"
+							],
+							"path": [
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "LOCAL_URL",
+			"value": "http://localhost:8081"
+		},
+		{
+			"key": "username",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "password",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refresh_token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

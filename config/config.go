@@ -28,6 +28,8 @@ type JWT struct {
 	RefreshExpiresIn time.Duration `yaml:"refresh_expires_in"`
 	PublicKey        string        `yaml:"public_key"`
 	PrivateKey       string        `yaml:"private_key"`
+	PublicKeyTest    string        `yaml:"public_key_test"`
+	PrivateKeyTest   string        `yaml:"private_key_test"`
 }
 
 func Parse(s string) (*Config, error) {
@@ -46,6 +48,8 @@ func Parse(s string) (*Config, error) {
 	}
 	c.JWT.PrivateKey = string(privateKey)
 	c.JWT.PublicKey = string(publicKey)
+	c.JWT.PrivateKeyTest = string(privateKey)
+	c.JWT.PublicKeyTest = string(publicKey)
 
 	return c, nil
 }

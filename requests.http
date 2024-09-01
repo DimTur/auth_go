@@ -1,7 +1,7 @@
 POST http://localhost:8081/register
 
 {
-    "username": "user1",
+    "username": "user5",
     "password": "123"
 }
 

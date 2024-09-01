@@ -74,9 +74,6 @@ type RegisterUserRequest struct {
 
 // RegisterUserResponse defines model for RegisterUserResponse.
 type RegisterUserResponse struct {
-	// Id Unique identifier for the registered user
-	Id int `json:"id"`
-
 	// Username Username of the newly registered user
 	Username string `json:"username"`
 }
