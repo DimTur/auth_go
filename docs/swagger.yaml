@@ -147,14 +147,10 @@ components:
     RegisterUserResponse:
       type: object
       properties:
-        id:
-          type: integer
-          description: Unique identifier for the registered user
         username:
           type: string
           description: Username of the newly registered user
       required:
-        - id
         - username
 
     LoginUserResponse:
